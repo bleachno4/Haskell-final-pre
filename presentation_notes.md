@@ -47,6 +47,22 @@
 - List processing：穷举输入组合，生成真值表并做等价性检查。
 - Pure code generation：输出 Verilog-style `assign`。
 
+押题版说法：
+
+```text
+Maybe / Either：表达失败，不靠异常或默认值。
+Functor：用 <$> 只变换成功值，例如 Not <$> parseNot。
+Applicative：用 <*> 组合多个可能失败的子计算，例如 AND 左右两边求值。
+Monad：用 do / >>= 串起依赖前一步结果的计算，例如 parser 和 State netlist。
+Alternative：用 <|> 表达 parser 分支选择。
+```
+
+如果老师追问，按这个公式回答：
+
+```text
+概念是什么 -> 代码里哪里用了 -> 为什么适合 EDA demo
+```
+
 ## 3. Demo 1：基础表达式
 
 样例文件：
