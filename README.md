@@ -149,12 +149,16 @@ runghc -isrc src\Main.hs examples\basic.logic examples\full_adder.logic examples
 
 ## 6. 一周内的建议分工
 
-| 成员 | 负责内容 | 对应文件 / 产出 |
+原则：四个人都要能打开 `src/CircuitEDA.hs` 讲自己负责的代码，A 只用 1 分钟做选题和背景引入，不能只负责“选题”。建议按 EDA 前端流水线拆分，每个人负责一个真实代码模块。
+
+| 成员 | 代码责任 | 展示责任 | 工作量 |
 |---|---|---|
-| A | EDA 背景、选题动机、汇报开头和总结 | `presentation_notes.md` 第 1-2 部分 |
-| B | AST、ADT、模式匹配、pretty print | `src/CircuitEDA.hs` 的 `Expr`、`pretty`、`renderTree` |
-| C | 求值、Either 错误处理、多输出真值表、等价性检查 | `evalAssignment`、`renderTruthTable`、`equivalenceReport` |
-| D | parser、simplify、State 风格 netlist、Verilog 输出、现场运行 | `parseDesign`、`simplify`、`renderNetlist`、`renderVerilog`、运行脚本 |
+| A | 输入语言和 parser：`Parser`、`parseDesign`、`exprParser`、`parseOr/parseXor/parseAnd/parseNot`、`examples/bad_syntax.logic` | 开场 1 分钟；讲为什么要先把文本解析成 AST；讲 parser combinator、优先级、解析失败 | 约 25% |
+| B | 电路数据结构和分析：`Expr`、`Assignment`、`Design`、`pretty`、`vars`、`gateCount`、`depth`、`renderTree` | 讲 ADT、递归、模式匹配如何表示电路树；展示 AST 树、门数量、深度 | 约 24% |
+| C | 语义、仿真和验证：`eval`、`evalWith`、`evalAssignment`、`renderTruthTable`、`equivalenceReport`、`demoMissingSignal` | 讲 `Either`、Applicative、未知信号错误、多输出真值表、穷举等价性检查 | 约 27% |
+| D | 转换和输出：`simplify`、`simplifyDesign`、`SimpleState`、`renderNetlist`、`renderVerilog`、`run_demo.ps1/.bat` | 讲模式匹配化简、State 风格编号、netlist、Verilog-style 输出和现场集成运行 | 约 24% |
+
+详细分工见 `分工与工作量.md`。
 
 ## 7. 现场备用方案
 

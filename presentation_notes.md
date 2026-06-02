@@ -264,20 +264,22 @@ endmodule
 
 ## 14. 四人讲解分配
 
-| 成员 | 建议讲解内容 |
+原则：四个人都讲代码。A 只用很短时间做开场，然后主要负责 parser；背景和选题动机不作为单独工作量。
+
+| 成员 | 代码模块 | 建议讲解内容 |
 |---|---|
-| A | 背景、EDA 前端流程、为什么选这个题 |
-| B | AST、ADT、模式匹配，展示 `Expr` 和 `renderTree` |
-| C | `evalAssignment`、`Either`、多输出 truth table、equivalence check，现场跑 full_adder/simplify |
-| D | parser、simplify、State netlist、Verilog-style output，现场跑 advanced_gates |
+| A | `Parser`、`parseDesign`、`exprParser`、`parseOr/parseXor/parseAnd/parseNot` | 1 分钟开场；讲输入语言、parser combinator、优先级、bad syntax 错误 |
+| B | `Expr`、`Design`、`pretty`、`vars`、`gateCount`、`depth`、`renderTree` | 讲 AST、ADT、递归、模式匹配，展示电路树和结构分析 |
+| C | `eval`、`evalAssignment`、`renderTruthTable`、`equivalenceReport`、`demoMissingSignal` | 讲 `Either`、Applicative、多输出 truth table、full adder、等价性检查 |
+| D | `simplify`、`SimpleState`、`renderNetlist`、`renderVerilog`、运行脚本 | 讲模式匹配化简、State 风格 netlist、Verilog-style output，负责现场集成运行 |
 
 ## 15. 时间控制
 
 建议 20 分钟：
 
-- 0-3 min：背景和选题动机
-- 3-7 min：Haskell 知识点和代码结构
-- 7-11 min：AST 建模
-- 11-15 min：truth table + full adder demo
-- 15-18 min：simplify + equivalence check + netlist/Verilog output
-- 18-20 min：总结和扩展
+- 0-1 min：A 开场和题目定位
+- 1-5 min：A 讲输入语言和 parser combinator
+- 5-9 min：B 讲 AST、ADT、递归和结构分析
+- 9-14 min：C 讲求值、`Either`、truth table、full adder 和 equivalence check
+- 14-19 min：D 讲 simplify、State netlist、Verilog-style output 和现场运行
+- 19-20 min：全组总结：Haskell 适合做结构化生成、转换和检查，不是替代主流 RTL 语言
