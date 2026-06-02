@@ -1,0 +1,4 @@
+# Basic combinational circuit
+# out = (a AND b) OR (NOT c)
+
+out = (a AND b) OR (NOT c)

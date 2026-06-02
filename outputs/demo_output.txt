@@ -1,0 +1,443 @@
+﻿Functional EDA demo in Haskell
+Topic: Boolean expression -> AST -> truth table -> simplified netlist -> Verilog assign
+Haskell ideas: ADT, recursion, pattern matching, Either, parser combinators, State, pure code generation
+
+
+Running bundled examples...
+
+========================================================================
+Demo: basic
+========================================================================
+Input design:
+  out = a AND b OR NOT c
+
+1) AST as circuit trees
+[out]
+OR
+  +- AND
+  |  +- VAR a
+  |  `- VAR b
+  `- NOT
+     `- VAR c
+
+2) Basic analysis
+  primary inputs : a, b, c
+  assigned signals: out
+  total gates     : 3
+  max depth       : 3
+
+3) Truth table, including multiple outputs
+a | b | c | out
+--+---+---+----
+0 | 0 | 0 | 1  
+0 | 0 | 1 | 0  
+0 | 1 | 0 | 1  
+0 | 1 | 1 | 0  
+1 | 0 | 0 | 1  
+1 | 0 | 1 | 0  
+1 | 1 | 0 | 1  
+1 | 1 | 1 | 1  
+
+4) Simplification + exhaustive equivalence check
+  no simplification rule changed this design.
+  check : equivalent on all 8 input combinations
+
+5) Netlist generated with a small State monad
+n1 = AND a b
+n2 = NOT c
+n3 = OR n1 n2
+out = BUF n3
+
+6) Verilog-style assign output
+module functional_eda_demo(
+  input a,
+  input b,
+  input c,
+  output out
+);
+  assign out = ((a & b) | (~c));
+endmodule
+
+7) Missing-signal error demo
+  Evaluate with signal 'a' missing: unknown signal: a
+
+========================================================================
+Demo: mux
+========================================================================
+Input design:
+  out = NOT sel AND a OR sel AND b
+
+1) AST as circuit trees
+[out]
+OR
+  +- AND
+  |  +- NOT
+  |  |  `- VAR sel
+  |  `- VAR a
+  `- AND
+     +- VAR sel
+     `- VAR b
+
+2) Basic analysis
+  primary inputs : a, b, sel
+  assigned signals: out
+  total gates     : 4
+  max depth       : 4
+
+3) Truth table, including multiple outputs
+a | b | sel | out
+--+---+-----+----
+0 | 0 | 0   | 0  
+0 | 0 | 1   | 0  
+0 | 1 | 0   | 0  
+0 | 1 | 1   | 1  
+1 | 0 | 0   | 1  
+1 | 0 | 1   | 0  
+1 | 1 | 0   | 1  
+1 | 1 | 1   | 1  
+
+4) Simplification + exhaustive equivalence check
+  no simplification rule changed this design.
+  check : equivalent on all 8 input combinations
+
+5) Netlist generated with a small State monad
+n1 = NOT sel
+n2 = AND n1 a
+n3 = AND sel b
+n4 = OR n2 n3
+out = BUF n4
+
+6) Verilog-style assign output
+module functional_eda_demo(
+  input a,
+  input b,
+  input sel,
+  output out
+);
+  assign out = (((~sel) & a) | (sel & b));
+endmodule
+
+7) Missing-signal error demo
+  Evaluate with signal 'a' missing: unknown signal: a
+
+========================================================================
+Demo: full_adder
+========================================================================
+Input design:
+  sum = a XOR b XOR cin
+  carry = a AND b OR cin AND (a XOR b)
+
+1) AST as circuit trees
+[sum]
+XOR
+  +- XOR
+  |  +- VAR a
+  |  `- VAR b
+  `- VAR cin
+
+[carry]
+OR
+  +- AND
+  |  +- VAR a
+  |  `- VAR b
+  `- AND
+     +- VAR cin
+     `- XOR
+        +- VAR a
+        `- VAR b
+
+2) Basic analysis
+  primary inputs : a, b, cin
+  assigned signals: sum, carry
+  total gates     : 6
+  max depth       : 4
+
+3) Truth table, including multiple outputs
+a | b | cin | sum | carry
+--+---+-----+-----+------
+0 | 0 | 0   | 0   | 0    
+0 | 0 | 1   | 1   | 0    
+0 | 1 | 0   | 1   | 0    
+0 | 1 | 1   | 0   | 1    
+1 | 0 | 0   | 1   | 0    
+1 | 0 | 1   | 0   | 1    
+1 | 1 | 0   | 0   | 1    
+1 | 1 | 1   | 1   | 1    
+
+4) Simplification + exhaustive equivalence check
+  no simplification rule changed this design.
+  check : equivalent on all 8 input combinations
+
+5) Netlist generated with a small State monad
+n1 = XOR a b
+n2 = XOR n1 cin
+sum = BUF n2
+n3 = AND a b
+n4 = XOR a b
+n5 = AND cin n4
+n6 = OR n3 n5
+carry = BUF n6
+
+6) Verilog-style assign output
+module functional_eda_demo(
+  input a,
+  input b,
+  input cin,
+  output sum,
+  output carry
+);
+  assign sum = ((a ^ b) ^ cin);
+  assign carry = ((a & b) | (cin & (a ^ b)));
+endmodule
+
+7) Missing-signal error demo
+  Evaluate with signal 'a' missing: unknown signal: a
+
+========================================================================
+Demo: simplify
+========================================================================
+Input design:
+  out = a AND TRUE OR NOT NOT b
+
+1) AST as circuit trees
+[out]
+OR
+  +- AND
+  |  +- VAR a
+  |  `- CONST TRUE
+  `- NOT
+     `- NOT
+        `- VAR b
+
+2) Basic analysis
+  primary inputs : a, b
+  assigned signals: out
+  total gates     : 4
+  max depth       : 4
+
+3) Truth table, including multiple outputs
+a | b | out
+--+---+----
+0 | 0 | 0  
+0 | 1 | 1  
+1 | 0 | 1  
+1 | 1 | 1  
+
+4) Simplification + exhaustive equivalence check
+  out:
+    before: a AND TRUE OR NOT NOT b
+    after : a OR b
+  gates : 4 -> 1
+  check : equivalent on all 4 input combinations
+
+5) Netlist generated with a small State monad
+n1 = OR a b
+out = BUF n1
+
+6) Verilog-style assign output
+module functional_eda_demo(
+  input a,
+  input b,
+  output out
+);
+  assign out = (a | b);
+endmodule
+
+7) Missing-signal error demo
+  Evaluate with signal 'a' missing: unknown signal: a
+
+========================================================================
+Demo: advanced_gates
+========================================================================
+Input design:
+  out = a NAND b NOR c XOR d
+
+1) AST as circuit trees
+[out]
+NOR
+  +- NAND
+  |  +- VAR a
+  |  `- VAR b
+  `- XOR
+     +- VAR c
+     `- VAR d
+
+2) Basic analysis
+  primary inputs : a, b, c, d
+  assigned signals: out
+  total gates     : 3
+  max depth       : 3
+
+3) Truth table, including multiple outputs
+a | b | c | d | out
+--+---+---+---+----
+0 | 0 | 0 | 0 | 0  
+0 | 0 | 0 | 1 | 0  
+0 | 0 | 1 | 0 | 0  
+0 | 0 | 1 | 1 | 0  
+0 | 1 | 0 | 0 | 0  
+0 | 1 | 0 | 1 | 0  
+0 | 1 | 1 | 0 | 0  
+0 | 1 | 1 | 1 | 0  
+1 | 0 | 0 | 0 | 0  
+1 | 0 | 0 | 1 | 0  
+1 | 0 | 1 | 0 | 0  
+1 | 0 | 1 | 1 | 0  
+1 | 1 | 0 | 0 | 1  
+1 | 1 | 0 | 1 | 0  
+1 | 1 | 1 | 0 | 0  
+1 | 1 | 1 | 1 | 1  
+
+4) Simplification + exhaustive equivalence check
+  no simplification rule changed this design.
+  check : equivalent on all 16 input combinations
+
+5) Netlist generated with a small State monad
+n1 = NAND a b
+n2 = XOR c d
+n3 = NOR n1 n2
+out = BUF n3
+
+6) Verilog-style assign output
+module functional_eda_demo(
+  input a,
+  input b,
+  input c,
+  input d,
+  output out
+);
+  assign out = (~((~(a & b)) | (c ^ d)));
+endmodule
+
+7) Missing-signal error demo
+  Evaluate with signal 'a' missing: unknown signal: a
+
+========================================================================
+Demo: majority
+========================================================================
+Input design:
+  out = a AND b OR a AND c OR b AND c
+
+1) AST as circuit trees
+[out]
+OR
+  +- OR
+  |  +- AND
+  |  |  +- VAR a
+  |  |  `- VAR b
+  |  `- AND
+  |     +- VAR a
+  |     `- VAR c
+  `- AND
+     +- VAR b
+     `- VAR c
+
+2) Basic analysis
+  primary inputs : a, b, c
+  assigned signals: out
+  total gates     : 5
+  max depth       : 4
+
+3) Truth table, including multiple outputs
+a | b | c | out
+--+---+---+----
+0 | 0 | 0 | 0  
+0 | 0 | 1 | 0  
+0 | 1 | 0 | 0  
+0 | 1 | 1 | 1  
+1 | 0 | 0 | 0  
+1 | 0 | 1 | 1  
+1 | 1 | 0 | 1  
+1 | 1 | 1 | 1  
+
+4) Simplification + exhaustive equivalence check
+  no simplification rule changed this design.
+  check : equivalent on all 8 input combinations
+
+5) Netlist generated with a small State monad
+n1 = AND a b
+n2 = AND a c
+n3 = OR n1 n2
+n4 = AND b c
+n5 = OR n3 n4
+out = BUF n5
+
+6) Verilog-style assign output
+module functional_eda_demo(
+  input a,
+  input b,
+  input c,
+  output out
+);
+  assign out = (((a & b) | (a & c)) | (b & c));
+endmodule
+
+7) Missing-signal error demo
+  Evaluate with signal 'a' missing: unknown signal: a
+
+
+================ BAD SYNTAX DEMO ================
+========================================================================
+Demo: bad_syntax
+========================================================================
+Parse error:
+  could not parse expression: (a AND) OR b
+
+
+================ INLINE EXPR DEMO ================
+========================================================================
+Demo: inline expression
+========================================================================
+Input design:
+  out = a AND b OR NOT c
+
+1) AST as circuit trees
+[out]
+OR
+  +- AND
+  |  +- VAR a
+  |  `- VAR b
+  `- NOT
+     `- VAR c
+
+2) Basic analysis
+  primary inputs : a, b, c
+  assigned signals: out
+  total gates     : 3
+  max depth       : 3
+
+3) Truth table, including multiple outputs
+a | b | c | out
+--+---+---+----
+0 | 0 | 0 | 1  
+0 | 0 | 1 | 0  
+0 | 1 | 0 | 1  
+0 | 1 | 1 | 0  
+1 | 0 | 0 | 1  
+1 | 0 | 1 | 0  
+1 | 1 | 0 | 1  
+1 | 1 | 1 | 1  
+
+4) Simplification + exhaustive equivalence check
+  no simplification rule changed this design.
+  check : equivalent on all 8 input combinations
+
+5) Netlist generated with a small State monad
+n1 = AND a b
+n2 = NOT c
+n3 = OR n1 n2
+out = BUF n3
+
+6) Verilog-style assign output
+module functional_eda_demo(
+  input a,
+  input b,
+  input c,
+  output out
+);
+  assign out = ((a & b) | (~c));
+endmodule
+
+7) Missing-signal error demo
+  Evaluate with signal 'a' missing: unknown signal: a
+

@@ -1,0 +1,4 @@
+# This file is intentionally wrong.
+# It is useful when explaining parser failure.
+
+out = (a AND) OR b

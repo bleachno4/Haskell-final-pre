@@ -1,0 +1,4 @@
+# Advanced gates beyond AND/OR/NOT.
+# The parser now accepts XOR, NAND and NOR.
+
+out = (a NAND b) NOR (c XOR d)

@@ -1,0 +1,5 @@
+# One-bit full adder with two outputs.
+# This makes the demo look more like a small combinational module.
+
+sum = a XOR b XOR cin
+carry = (a AND b) OR (cin AND (a XOR b))
