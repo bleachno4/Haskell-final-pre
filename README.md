@@ -64,6 +64,11 @@ finalpre/
   run_demo.ps1
   src/
     CircuitEDA.hs
+    CircuitEDA/
+      AST.hs
+      Parser.hs
+      Eval.hs
+      Transform.hs
     Main.hs
   examples/
     basic.logic
@@ -82,7 +87,11 @@ finalpre/
 
 其中：
 
-- `src/CircuitEDA.hs`：核心逻辑，包括 AST、parser、eval、truth table、simplify、等价性检查、netlist、Verilog-style output。
+- `src/CircuitEDA.hs`：对外统一导出模块，`Main.hs` 只需要 `import CircuitEDA`。
+- `src/CircuitEDA/Parser.hs`：A 负责，输入语言、parser combinator、表达式优先级和解析失败。
+- `src/CircuitEDA/AST.hs`：B 负责，`Expr`、`Design`、pretty print、变量分析、门数量、深度和 AST 树。
+- `src/CircuitEDA/Eval.hs`：C 负责，`eval`、`Either` 错误处理、truth table、等价性检查和缺失信号 demo。
+- `src/CircuitEDA/Transform.hs`：D 负责，逻辑化简、State 风格 netlist 和 Verilog-style 输出。
 - `src/Main.hs`：命令行 demo 入口。
 - `examples/*.logic`：课堂展示用样例电路。
 - `outputs/demo_output.txt`：已保存的一份运行结果，现场环境出问题时可以作为备用展示。
@@ -149,14 +158,14 @@ runghc -isrc src\Main.hs examples\basic.logic examples\full_adder.logic examples
 
 ## 6. 一周内的建议分工
 
-原则：四个人都要能打开 `src/CircuitEDA.hs` 讲自己负责的代码，A 只用 1 分钟做选题和背景引入，不能只负责“选题”。建议按 EDA 前端流水线拆分，每个人负责一个真实代码模块。
+原则：四个人都要能打开自己负责的 `.hs` 文件讲代码，A 只用 1 分钟做题目定位和背景引入，不能只负责“选题”。建议按 EDA 前端流水线拆分，每个人负责一个真实代码模块。
 
 | 成员 | 代码责任 | 展示责任 | 工作量 |
 |---|---|---|
-| A | 输入语言和 parser：`Parser`、`parseDesign`、`exprParser`、`parseOr/parseXor/parseAnd/parseNot`、`examples/bad_syntax.logic` | 开场 1 分钟；讲为什么要先把文本解析成 AST；讲 parser combinator、优先级、解析失败 | 约 25% |
-| B | 电路数据结构和分析：`Expr`、`Assignment`、`Design`、`pretty`、`vars`、`gateCount`、`depth`、`renderTree` | 讲 ADT、递归、模式匹配如何表示电路树；展示 AST 树、门数量、深度 | 约 24% |
-| C | 语义、仿真和验证：`eval`、`evalWith`、`evalAssignment`、`renderTruthTable`、`equivalenceReport`、`demoMissingSignal` | 讲 `Either`、Applicative、未知信号错误、多输出真值表、穷举等价性检查 | 约 27% |
-| D | 转换和输出：`simplify`、`simplifyDesign`、`SimpleState`、`renderNetlist`、`renderVerilog`、`run_demo.ps1/.bat` | 讲模式匹配化简、State 风格编号、netlist、Verilog-style 输出和现场集成运行 | 约 24% |
+| A | `src/CircuitEDA/Parser.hs`：`Parser`、`parseDesign`、`exprParser`、`parseOr/parseXor/parseAnd/parseNot`、`examples/bad_syntax.logic` | 开场 1 分钟；讲为什么要先把文本解析成 AST；讲 parser combinator、优先级、解析失败 | 约 25% |
+| B | `src/CircuitEDA/AST.hs`：`Expr`、`Assignment`、`Design`、`pretty`、`vars`、`gateCount`、`depth`、`renderTree` | 讲 ADT、递归、模式匹配如何表示电路树；展示 AST 树、门数量、深度 | 约 24% |
+| C | `src/CircuitEDA/Eval.hs`：`eval`、`evalWith`、`evalAssignment`、`renderTruthTable`、`equivalenceReport`、`demoMissingSignal` | 讲 `Either`、Applicative、未知信号错误、多输出真值表、穷举等价性检查 | 约 27% |
+| D | `src/CircuitEDA/Transform.hs`：`simplify`、`simplifyDesign`、`SimpleState`、`renderNetlist`、`renderVerilog`、`run_demo.ps1/.bat` | 讲模式匹配化简、State 风格编号、netlist、Verilog-style 输出和现场集成运行 | 约 24% |
 
 详细分工见 `分工与工作量.md`。
 
@@ -166,6 +175,6 @@ runghc -isrc src\Main.hs examples\basic.logic examples\full_adder.logic examples
 
 1. 打开 `outputs/demo_output.txt` 展示完整运行结果。
 2. 用 `examples/*.logic` 展示输入。
-3. 用 `src/CircuitEDA.hs` 展示关键代码片段。
+3. 用 `src/CircuitEDA/Parser.hs`、`AST.hs`、`Eval.hs`、`Transform.hs` 展示关键代码片段。
 
 这样即使不现场编译，也能完整讲完。

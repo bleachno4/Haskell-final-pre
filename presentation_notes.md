@@ -268,10 +268,10 @@ endmodule
 
 | 成员 | 代码模块 | 建议讲解内容 |
 |---|---|
-| A | `Parser`、`parseDesign`、`exprParser`、`parseOr/parseXor/parseAnd/parseNot` | 1 分钟开场；讲输入语言、parser combinator、优先级、bad syntax 错误 |
-| B | `Expr`、`Design`、`pretty`、`vars`、`gateCount`、`depth`、`renderTree` | 讲 AST、ADT、递归、模式匹配，展示电路树和结构分析 |
-| C | `eval`、`evalAssignment`、`renderTruthTable`、`equivalenceReport`、`demoMissingSignal` | 讲 `Either`、Applicative、多输出 truth table、full adder、等价性检查 |
-| D | `simplify`、`SimpleState`、`renderNetlist`、`renderVerilog`、运行脚本 | 讲模式匹配化简、State 风格 netlist、Verilog-style output，负责现场集成运行 |
+| A | `src/CircuitEDA/Parser.hs`：`Parser`、`parseDesign`、`exprParser`、`parseOr/parseXor/parseAnd/parseNot` | 1 分钟开场；讲输入语言、parser combinator、优先级、bad syntax 错误 |
+| B | `src/CircuitEDA/AST.hs`：`Expr`、`Design`、`pretty`、`vars`、`gateCount`、`depth`、`renderTree` | 讲 AST、ADT、递归、模式匹配，展示电路树和结构分析 |
+| C | `src/CircuitEDA/Eval.hs`：`eval`、`evalAssignment`、`renderTruthTable`、`equivalenceReport`、`demoMissingSignal` | 讲 `Either`、Applicative、多输出 truth table、full adder、等价性检查 |
+| D | `src/CircuitEDA/Transform.hs`：`simplify`、`SimpleState`、`renderNetlist`、`renderVerilog`、运行脚本 | 讲模式匹配化简、State 风格 netlist、Verilog-style output，负责现场集成运行 |
 
 ## 15. 时间控制
 

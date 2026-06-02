@@ -757,19 +757,18 @@ D:\Haskell\finalpre\outputs\demo_output.txt
 打开：
 
 ```text
-D:\Haskell\finalpre\src\CircuitEDA.hs
+D:\Haskell\finalpre\src\CircuitEDA\Parser.hs
+D:\Haskell\finalpre\src\CircuitEDA\AST.hs
+D:\Haskell\finalpre\src\CircuitEDA\Eval.hs
+D:\Haskell\finalpre\src\CircuitEDA\Transform.hs
 ```
 
 重点看：
 
-- `data Expr`
-- `parseDesign`
-- `eval`
-- `evalAssignment`
-- `simplify`
-- `equivalenceReport`
-- `renderNetlist`
-- `renderVerilog`
+- A：`Parser`、`parseDesign`、`exprParser`
+- B：`data Expr`、`renderTree`、`gateCount`、`depth`
+- C：`eval`、`evalAssignment`、`renderTruthTable`、`equivalenceReport`
+- D：`simplify`、`SimpleState`、`renderNetlist`、`renderVerilog`
 
 ---
 
