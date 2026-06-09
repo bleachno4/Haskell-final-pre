@@ -95,10 +95,7 @@ finalpre/
 - `src/Main.hs`：命令行 demo 入口。
 - `examples/*.logic`：课堂展示用样例电路。
 - `outputs/demo_output.txt`：已保存的一份运行结果，现场环境出问题时可以作为备用展示。
-- `演讲稿_详细版.md`：四人小组展示用详细台词，包含技术细节、demo 指令、取舍说明。
-- `tips.md`：答辩问答库，用于应对老师追问“为什么这样做、缺少什么、舍弃了什么”。
-- `Haskell_EDA_Haskell技术主线说明.pdf`：新版技术主线 PDF，重点说明用了哪些 Haskell 知识、这些知识是什么、为什么适合 EDA demo。
-- `archive/`：旧版选题材料归档。正式展示优先使用新版技术主线 PDF、演讲稿和 tips。
+
 
 ## 3. 表达式语法
 
@@ -142,21 +139,6 @@ carry = (a AND b) OR (cin AND (a XOR b))
 | `renderVerilog` | DSL / code generation | 输出 Verilog-style `assign` |
 | `truth table` | List processing | 枚举输入组合并仿真 |
 
-## 5. 推荐现场演示顺序
-
-1. 先运行 `examples/basic.logic`，说明从表达式到 AST、真值表、netlist。
-2. 再运行 `examples/full_adder.logic`，展示多输出组合逻辑模块。
-3. 再运行 `examples/simplify.logic`，展示模式匹配化简和穷举等价性检查。
-4. 再运行 `examples/advanced_gates.logic`，展示 XOR/NAND/NOR 等更像电路的门。
-5. 最后展示 `examples/bad_syntax.logic`，说明 parser 能发现非法输入。
-
-命令：
-
-```powershell
-runghc -isrc src\Main.hs examples\basic.logic examples\full_adder.logic examples\simplify.logic examples\advanced_gates.logic examples\bad_syntax.logic
-```
-
-## 6. 一周内的建议分工
 
 原则：四个人都要能打开自己负责的 `.hs` 文件讲代码，A 只用 1 分钟做题目定位和背景引入，不能只负责“选题”。建议按 EDA 前端流水线拆分，每个人负责一个真实代码模块。
 
@@ -167,14 +149,3 @@ runghc -isrc src\Main.hs examples\basic.logic examples\full_adder.logic examples
 | C | `src/CircuitEDA/Eval.hs`：`eval`、`evalWith`、`evalAssignment`、`renderTruthTable`、`equivalenceReport`、`demoMissingSignal` | 讲 `Either`、Applicative、未知信号错误、多输出真值表、穷举等价性检查 | 约 27% |
 | D | `src/CircuitEDA/Transform.hs`：`simplify`、`simplifyDesign`、`SimpleState`、`renderNetlist`、`renderVerilog`、`run_demo.ps1/.bat` | 讲模式匹配化简、State 风格编号、netlist、Verilog-style 输出和现场集成运行 | 约 24% |
 
-详细分工见 `分工与工作量.md`。
-
-## 7. 现场备用方案
-
-如果现场 Haskell 环境出问题：
-
-1. 打开 `outputs/demo_output.txt` 展示完整运行结果。
-2. 用 `examples/*.logic` 展示输入。
-3. 用 `src/CircuitEDA/Parser.hs`、`AST.hs`、`Eval.hs`、`Transform.hs` 展示关键代码片段。
-
-这样即使不现场编译，也能完整讲完。
